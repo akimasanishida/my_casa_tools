@@ -1,7 +1,6 @@
 import os
 import numpy as np
 from matplotlib.patches import Ellipse
-from casatasks import imval, imhead
 import matplotlib.pyplot as plt
 from .Image import Image
 from .utilities import unitDict

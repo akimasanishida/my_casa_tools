@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 # import matplotlib.ticker as ticker
 
+import numpy as np
 from .Image import Image
 from .utilities import unitDict
 from .matplotlib_helper import set_axes_options, set_cbar
@@ -36,7 +37,12 @@ def compimage(imagename1, imagename2, savename=None, fig_width=None, fig_height=
     img1.convert_axes_unit('arcsec')
     img2.convert_axes_unit('arcsec')
     xticks, xticks_label, yticks, yticks_label = img1.get_ticks(xtickspan, ytickspan, relative, ticksfmt)
-    cax = ax.imshow(img1.img - img2.img, cmap=cmap, origin='lower')
+    data = img1.img - img2.img
+    vmax = np.max(data)
+    vmin = np.min(data)
+    vmax = max(abs(vmax), abs(vmin))
+    vmin = -vmax
+    cax = ax.imshow(img1.img - img2.img, cmap=cmap, origin='lower', vmax=vmax, vmin=vmin)
     set_axes_options(ax, f'{imagename1}\nv.s.\n{imagename2}', img1.axisname_x + f'[{unitDict[img1.axis_unit_x]}]',
                      img1.axisname_y + f'[{unitDict[img1.axis_unit_y]}]', xticks, xticks_label, yticks, yticks_label)
     set_cbar(fig, cax, img1.imtype, img1.im_unit, rescale, cbarfmt, ':.2f')
