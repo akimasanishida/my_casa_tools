@@ -1,6 +1,9 @@
 import math
+import os
 
 unitConvDict = {
+    ('rad', 'rad'): 1,
+    ('arcsec', 'arcsec'): 1,
     ('rad', 'arcsec'): (3600 * 180) / math.pi,
     ('arcsec', 'rad'): math.pi / (3600 * 180),
 }
@@ -39,3 +42,7 @@ def get_si_prefix_base10(prefix: str) -> float:
     except KeyError:
         return siPrefixDict['None']['base10']
 
+def get_pret_dir_name(dir: str) -> str:
+    while dir[-1] != '/' or len(dir) != 0:
+        dir = dir[:-1]
+    return os.path.split(dir)

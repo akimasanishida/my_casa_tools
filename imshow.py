@@ -3,10 +3,10 @@ import numpy as np
 from matplotlib.patches import Ellipse
 import matplotlib.pyplot as plt
 from .Image import Image
-from .utilities import unitDict
+from .utilities import unitDict, get_pret_dir_name
 from .matplotlib_helper import set_cbar, set_axes_options
 
-def imshow(imagename, savename=None, fig_width=None, fig_height=None, title=None, cmap='jet', vmin=None, vmax=None, rescale=None,
+def imshow(imagename, savename=None, fig_width=None, fig_height=None, title=None, cmap='jet', vmin=None, vmax=None, rescale='milli',
            cbarfmt=':.2f', axesunit='arcsec', relative=True, xtickspan=1, ytickspan=1, ticksfmt=':.3f', show=True, dpi=300) -> None:
     """Rastering image with matplotlib from CASA style image file.
     
@@ -22,7 +22,7 @@ def imshow(imagename, savename=None, fig_width=None, fig_height=None, title=None
         cmap: Colormap. Default is `jet`.
         vmin (float, optional): minimum of data range that the colormap covers.
         vmax (float, optional): maximum of data range that the colormap covers.
-        rescale: Rescaling factor. This must be given as SI prefixies like `'milli'`.
+        rescale: Rescaling factor. This must be given as SI prefixies. Default is `'milli'`. None or `''` for no-rescale.
         cbarfmt: Colorbar's format. Python's format function style. Default is `':.2f'`.
         axesunit: Unit of axes. Default is `'arcsec'`.
         relative (bool, optional): If `true`, the coordination of ticks will be relative. If `false`, it will be global.
@@ -36,13 +36,11 @@ def imshow(imagename, savename=None, fig_width=None, fig_height=None, title=None
         - `relative = True`: Global coordination
         - colorbar format
     """
-    if imagename[-1] == '/':
-        imagename = imagename[:-1]
+    imagename = get_pret_dir_name(imagename)
     # open image
     img = Image(imagename, fig_width, fig_height)
     fig_width, fig_height = img.get_fig_size()
     img.convert_axes_unit(axesunit)
-    xticks, xticks_label, yticks, yticks_label = img.get_ticks(xtickspan, ytickspan, relative, ticksfmt)
     # plot
     fig = plt.figure()
     ax = fig.add_subplot()
@@ -59,7 +57,7 @@ def imshow(imagename, savename=None, fig_width=None, fig_height=None, title=None
     if title == None:
         title = imagename
     set_axes_options(ax, title, img.axisname_x + f'[{unitDict[img.axis_unit_x]}]', img.axisname_y + f'[{unitDict[img.axis_unit_y]}]',
-                     xticks, xticks_label, yticks, yticks_label)
+                     *img.get_ticks(xtickspan, ytickspan, relative, ticksfmt))
     # colorbar
     set_cbar(fig, cax, img.imtype, img.im_unit, rescale, cbarfmt, ':.2f')
     # save
