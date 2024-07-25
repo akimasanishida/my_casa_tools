@@ -43,6 +43,6 @@ def get_si_prefix_base10(prefix: str) -> float:
         return siPrefixDict['None']['base10']
 
 def get_pret_dir_name(dir: str) -> str:
-    while dir[-1] != '/' or len(dir) != 0:
+    while dir[-1] == '/' and len(dir) > 0:
         dir = dir[:-1]
-    return os.path.split(dir)
+    return os.path.split(dir)[1]
