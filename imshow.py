@@ -6,24 +6,17 @@ from .Image import Image
 from .PlotConfig import PlotConfig
 from .utilities import unitDict, get_pret_dir_name
 from .matplotlib_helper import set_cbar, set_axes_options
+from .prepare_image import prepare_image
 
 def imshow(imagename: str, **kwargs) -> None:
-    """Rastering image with matplotlib from CASA style image file.
-    
-    Create image from CASA style image file (`*.image`, `*.image.pbcor`,...) with matplotlib. You can save the image as common format (`*.png`, `*.jpg`,...).
-    Only intensity image is supported now.
+    """
+    Rasterizes an image with matplotlib from a CASA style image file.
 
     Args:
         imagename (str): CASA style image file.
-        **kwargs: Plot config keywords.
+        **kwargs: Plot configuration keywords.
     """
-    config = PlotConfig()
-    config.__dict__.update(kwargs)
-    imagename = get_pret_dir_name(imagename)
-    # open image
-    img = Image(imagename, config.width, config.height)
-    config.width, config.height = img.get_fig_size()
-    img.convert_axes_unit(config.axesunit)
+    img, config = prepare_image(imagename, kwargs)
     # plot
     fig = plt.figure()
     ax = fig.add_subplot()

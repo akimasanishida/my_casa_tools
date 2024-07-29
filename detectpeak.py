@@ -7,16 +7,21 @@ from .matplotlib_helper import set_axes_options, set_cbar
 from .utilities import unitDict, get_pret_dir_name
 
 def detectpeak(imagename: str, mask: str = None, markercolor: str = None, **kwargs) -> None:
-    config = PlotConfig()
-    config.__dict__.update(kwargs)
-    imagename = get_pret_dir_name(imagename)
-    img = Image(imagename, config.width, config.height)
-    config.width, config.height = img.get_fig_size()
-    img.convert_axes_unit(config.axesunit)
+    """
+    Detects peaks in an image.
+
+    Args:
+        imagename (str): The name of the image file.
+        mask (str, optional): The mask file. Defaults to None.
+        markercolor (str, optional): The color of the peak markers. Defaults to None.
+        **kwargs: Plot configuration keywords.
+    """
+    img, config = prepare_image(imagename, kwargs)
+    # plot
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     cax = ax.imshow(img.img, cmap=config.cmap, aspect='equal', vmin=config.vmin, vmax=config.vmax, origin='lower')
-    if config.title == None:
+    if config.title is None:
         config.title = f'Detected peak of {imagename}'
     set_axes_options(ax, config.title, img.axisname_x + f'[{unitDict[img.axis_unit_x]}]', img.axisname_y + f'[{unitDict[img.axis_unit_y]}]',
                      *img.get_ticks(config.xtickspan, config.ytickspan, config.relative, config.ticksfmt))

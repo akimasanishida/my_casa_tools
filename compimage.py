@@ -7,25 +7,22 @@ from .utilities import unitDict, get_pret_dir_name
 from .matplotlib_helper import set_axes_options, set_cbar
 
 def compimage(imagename1, imagename2, **kwargs):
-    """Compare two image
+    """
+    Compares two images.
 
     Args:
         imagename1 (str): CASA style image file.
         imagename2 (str): CASA style image file.
-        **kwargs: Plot config keywords.
+        **kwargs: Plot configuration keywords.
     """
-    config = PlotConfig()
-    config.__dict__.update(kwargs)
-    imagename1 = get_pret_dir_name(imagename1)
+    img1, config = prepare_image(imagename1, kwargs)
     imagename2 = get_pret_dir_name(imagename2)
-    img1 = Image(imagename1, config.width, config.height)
-    config.width, config.height = img1.get_fig_size()
     img2 = Image(imagename2, config.width, config.height)
+    img2.convert_axes_unit(config.axesunit)
+    # plot
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     fig.subplots_adjust(top=0.85)
-    img1.convert_axes_unit(config.axesunit)
-    img2.convert_axes_unit(config.axesunit)
     data = img1.img / (np.pi * img1.beam_x * img1.beam_y) - img2.img / (np.pi * img2.beam_x * img2.beam_y)
     config.vmax = np.max(data)
     config.vmin = np.min(data)
