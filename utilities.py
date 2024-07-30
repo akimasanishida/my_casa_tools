@@ -60,14 +60,14 @@ def get_si_prefix_base10(prefix: str) -> float:
     except KeyError:
         return siPrefixDict['None']['base10']
 
-# def get_pret_dir_name(dir: str) -> str:
-#     """
-#     Returns the last component of a directory path without trailing slashes.
+def get_pret_dir_name(dir: str) -> str:
+    """
+    Returns the last component of a directory path without trailing slashes.
 
-#     Args:
-#         dir (str): The directory path.
+    Args:
+        dir (str): The directory path.
 
-#     Returns:
-#         str: The last component of the directory path.
-#     """
-#     return os.path.split(dir.rstrip('/'))[1]
+    Returns:
+        str: The last component of the directory path.
+    """
+    return os.path.split(dir.rstrip('/'))[1]

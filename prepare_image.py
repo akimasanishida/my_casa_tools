@@ -16,11 +16,8 @@ def prepare_image(imagename: str, **kwargs) -> (Image, PlotConfig):
     """
     config = PlotConfig()
     config.__dict__.update(kwargs)
-    imagename = imagename.rstrip('/')
-    if config.savename == '':
-        config.savename = imagename + '.png'
     img = Image(imagename, config.width, config.height)
     config.width, config.height = img.get_fig_size()
     img.convert_axes_unit(config.axesunit)
-    imagename = os.path.split(imagename)[1]
+    imagename = get_pret_dir_name(imagename)
     return imagename, img, config

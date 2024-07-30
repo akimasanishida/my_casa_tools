@@ -1,9 +1,18 @@
 import numpy as np
 from .Image import Image
 
-def imstat(imagename: str, width: int=None, height: int=None, unit: str = 'beam', region_mask: str=None, inverse_mask: bool=False):
+def imstat(imagename: str, uncertainty: float, width: int = None, height: int = None, unit: str = 'beam', region_mask: str = None, inverse_mask: bool = False):
     """
     Alternative version of imstat.
+
+    Args:
+        imagename (str): Name of the image.
+        uncertainty (float): Flux uncertainty.
+        width (int, optional): Width of the region to perform the calculations. Defaults to None.
+        height (int, optional): Height of the region to perform the calculations. Defaults to None.
+        unit (str, optional): Unit of area. Choices are 'beam' or 'arcsec'. Defaults to 'beam'.
+        region_mask (str, optional): If specified, statistics are calculated using only the data within the mask. Defaults to None.
+        inverse_mask (bool, optional): If True, the specified mask region is inverted. Defaults to False.
     """
     img = Image(imagename, width, height)
     img.convert_axes_unit('arcsec')
@@ -19,6 +28,7 @@ def imstat(imagename: str, width: int=None, height: int=None, unit: str = 'beam'
     ret['unit'] = img.im_unit
     ret['all'] = {}
     ret['all']['max'] = np.max(img.img)
+    ret['all']['max_sigma'] = ret['all']['max'] * uncertainty
     ret['all']['min'] = np.min(img.img)
     ret['all']['sum'] = np.sum(img.img)
     ret['all']['sumsq'] = np.sum(np.square(img.img))
@@ -48,5 +58,6 @@ def imstat(imagename: str, width: int=None, height: int=None, unit: str = 'beam'
         ret['masked']['sigma'] = np.var(data, ddof=1)
         ret['masked']['rms'] = np.sqrt(ret['masked']['sumsq'] / data.size)
         ret['psnr'] = ret['all']['max'] / ret['masked']['rms']
+        ret['psnr_sigma'] = ret['all']['max_sigma'] / ret['masked']['rms']
     return ret
 
