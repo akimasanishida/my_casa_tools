@@ -3,7 +3,7 @@ from .Image import Image
 
 def imstat(imagename: str, width: int=None, height: int=None, unit: str = 'beam', region_mask: str=None, inverse_mask: bool=False):
     """
-    ToDo: Now only rms can be calculated. Add all quantities of `imstat`.
+    Alternative version of imstat.
     """
     img = Image(imagename, width, height)
     img.convert_axes_unit('arcsec')

@@ -16,7 +16,7 @@ def imshow(imagename: str, **kwargs) -> None:
         imagename (str): CASA style image file.
         **kwargs: Plot configuration keywords.
     """
-    img, config = prepare_image(imagename, kwargs)
+    imagename, img, config = prepare_image(imagename, **kwargs)
     # plot
     fig = plt.figure()
     ax = fig.add_subplot()
@@ -37,7 +37,7 @@ def imshow(imagename: str, **kwargs) -> None:
     # colorbar
     set_cbar(fig, cax, img.imtype, img.im_unit, config.rescale, config.cbarfmt, ':.2f')
     # save
-    if config.savename != None:
+    if config.savename is not None:
         if config.savename == '':
             config.savename = imagename + '.png'
         fig.savefig(config.savename, dpi=config.dpi)

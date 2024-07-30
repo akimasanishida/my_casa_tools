@@ -15,7 +15,7 @@ def compimage(imagename1, imagename2, **kwargs):
         imagename2 (str): CASA style image file.
         **kwargs: Plot configuration keywords.
     """
-    img1, config = prepare_image(imagename1, kwargs)
+    imagename1, img, config = prepare_image(imagename1, **kwargs)
     imagename2 = get_pret_dir_name(imagename2)
     img2 = Image(imagename2, config.width, config.height)
     img2.convert_axes_unit(config.axesunit)

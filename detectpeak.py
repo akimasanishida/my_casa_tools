@@ -16,7 +16,7 @@ def detectpeak(imagename: str, mask: str = None, markercolor: str = None, **kwar
         markercolor (str, optional): The color of the peak markers. Defaults to None.
         **kwargs: Plot configuration keywords.
     """
-    img, config = prepare_image(imagename, kwargs)
+    imagename, img, config = prepare_image(imagename, **kwargs)
     # plot
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
