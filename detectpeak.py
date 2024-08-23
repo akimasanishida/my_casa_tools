@@ -5,6 +5,7 @@ from .PlotConfig import PlotConfig
 from .Image import Image
 from .matplotlib_helper import set_axes_options, set_cbar
 from .utilities import unitDict, get_pret_dir_name
+from .prepare_image import prepare_image
 
 def detectpeak(imagename: str, mask: str = None, markercolor: str = None, **kwargs) -> None:
     """
@@ -47,9 +48,9 @@ def detectpeak(imagename: str, mask: str = None, markercolor: str = None, **kwar
                     peak_y.append(i)
                     peak[(j, i)] = img.img[i][j]
     else:
-        for i in range(cell // 2, config.height - cell // 2, 1):
-            for j in range(cell // 2, config.width - cell // 2, 1):
-                if img.img[i][j] == np.max(img.img[i - cell // 2 : i + cell // 2 + 1, j - cell // 2 : j + cell // 2]):
+        for i in range(cell_height // 2, config.height - cell_height // 2, 1):
+            for j in range(cell_width // 2, config.width - cell_width // 2, 1):
+                if img.img[i][j] == np.max(img.img[i - cell_height // 2 : i + cell_height // 2 + 1, j - cell_width // 2 : j + cell_width // 2]):
                     peak_x.append(j)
                     peak_y.append(i)
                     peak[(j, i)] = img.img[i][j]
