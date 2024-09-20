@@ -18,6 +18,8 @@ def imshow(imagename: str, **kwargs) -> None:
     """
     imagename, img, config = prepare_image(imagename, **kwargs)
     # plot
+    if not config.show:
+        plt.ioff()
     fig = plt.figure()
     ax = fig.add_subplot()
     cax = ax.imshow(img.img, cmap=config.cmap, aspect='equal', vmin=config.vmin, vmax=config.vmax, origin='lower')
