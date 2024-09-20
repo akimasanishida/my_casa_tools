@@ -26,7 +26,10 @@ def imstat(imagename: str, uncertainty: float, width: int = None, height: int = 
     ret = {}
     width, height = img.get_fig_size()
     ret['unit'] = img.im_unit
-    ret['restoring beam'] = f'{img.beam_x}″, {img.beam_y}″, {img.beam_ang}°'
+    ret['restoring beam'] = {}
+    ret['restoring beam']['x'] = img.beam_x
+    ret['restoring beam']['y'] = img.beam_y
+    ret['restoring beam']['ang'] = img.beam_ang
     ret['all'] = {}
     ret['all']['max'] = np.max(img.img)
     ret['all']['max_sigma'] = ret['all']['max'] * uncertainty
