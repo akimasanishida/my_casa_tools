@@ -1,9 +1,24 @@
 class PlotConfig:
     """General configuration for plot.
     """
-    def __init__(self, savename: str = None, width: int = None, height: int = None, title: str = None, cmap: str = 'jet', vmin: float = None,
-                 vmax: float = None, rescale: str = 'milli', cbarfmt: str = ':.2f', axesunit: str = 'arcsec', relative: bool = True,
-                 xtickspan: int = 2, ytickspan: int = 2, ticksfmt: str = ':.3f', show: bool = True, dpi: int = 300):
+    def __init__(self, savename: str = None,
+                 width: int = None,
+                 height: int = None,
+                 title: str = None,
+                 cmap: str = 'jet',
+                 vmin: float = None,
+                 vmax: float = None,
+                 cbeam: str = 'white',
+                 rescale: str = 'milli',
+                 cbarfmt: str = ':.2f',
+                 axesunit: str = 'arcsec',
+                 relative: bool = True,
+                 xtickspan: int = 2,
+                 ytickspan: int = 2,
+                 ticksfmt: str = ':.3f',
+                 show: bool = True,
+                 dpi: int = 300
+                 ):
         """
         Args:
             savename: Save file name. If `None`, image will not be saved. If `''`, image name will be determine by `imagename` and the format will be png.
@@ -13,6 +28,7 @@ class PlotConfig:
             cmap: Colormap. Default is `jet`.
             vmin: Minimum of data range that the colormap covers.
             vmax: Maximum of data range that the colormap covers.
+            cbeam: Color of beam. Default is `'white'`.
             rescale: Rescaling factor. This must be given as SI prefixies. Default is `'milli'`. None or `''` for no-rescale.
             cbarfmt: Colorbar's format. Python's format function style. Default is `':.2f'`.
             axesunit: Unit of axes. Default is `'arcsec'`.
@@ -30,6 +46,7 @@ class PlotConfig:
         self.cmap = cmap
         self.vmin = vmin
         self.vmax = vmax
+        self.cbeam = cbeam
         self.rescale = rescale
         self.cbarfmt = cbarfmt
         self.axesunit = axesunit

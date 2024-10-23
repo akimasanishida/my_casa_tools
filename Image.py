@@ -120,5 +120,3 @@ class Image:
         for i, s in enumerate(yticks_label):
             yticks_label[i] = _fmt.format(s)
         return xticks, xticks_label, yticks, yticks_label
-
-
