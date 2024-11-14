@@ -64,7 +64,7 @@ def imshow(imagename: str, **kwargs):
                          *img.get_ticks(config.xtickspan, config.ytickspan, config.relative, config.ticksfmt))
 
         # Set the colorbar
-        set_cbar(fig, cax, img.imtype, img.im_unit, config.rescale, config.cbarfmt, ':.2f')
+        set_cbar(fig, cax, config.cbarlabel, img.im_unit, config.rescale, config.cbarfmt, ':.2f')
 
         # Save the figure
         savename = config.savename
