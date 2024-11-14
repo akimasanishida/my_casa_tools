@@ -8,6 +8,7 @@ class PlotConfig:
                  cmap: str = 'jet',
                  vmin: float = None,
                  vmax: float = None,
+                 cbar: str = 'common',
                  cbeam: str = 'white',
                  rescale: str = 'milli',
                  cbarfmt: str = ':.2f',
@@ -28,6 +29,7 @@ class PlotConfig:
             cmap: Colormap. Default is `jet`.
             vmin: Minimum of data range that the colormap covers.
             vmax: Maximum of data range that the colormap covers.
+            cbar: Colorbar range settings. Default is `'common'`. Other options are `'individual'`. If vmin or vmax is given, these values will be used primarily.
             cbeam: Color of beam. Default is `'white'`.
             rescale: Rescaling factor. This must be given as SI prefixies. Default is `'milli'`. None or `''` for no-rescale.
             cbarfmt: Colorbar's format. Python's format function style. Default is `':.2f'`.
@@ -36,7 +38,7 @@ class PlotConfig:
             xtickspan: Number of ticks of x-axis. Default is 2.
             ytickspan: Number of ticks of y-axis. Default is 2.
             ticksfmt: Ticks' format. Python's format function style. Default is `':.3f'`.
-            show: Show plot.
+            show: Show plot. Default is `True`. If the image is a cube, this will always be `False`.
             dpi: DPI of saved image. Default is `300`.
         """
         self.savename = savename
@@ -46,6 +48,7 @@ class PlotConfig:
         self.cmap = cmap
         self.vmin = vmin
         self.vmax = vmax
+        self.cbar = cbar
         self.cbeam = cbeam
         self.rescale = rescale
         self.cbarfmt = cbarfmt

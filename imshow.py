@@ -33,34 +33,48 @@ def imshow(imagename: str, **kwargs):
     """
     imagename, img, config = prepare_image(imagename, **kwargs)
     # plot
-    if not config.show:
+    if not config.show or img.is_cube:
         plt.ioff()
-    
-    fig, ax = plt.subplots()
 
     # Draw the image
-    cax = ax.imshow(img.img, cmap=config.cmap, aspect='equal', vmin=config.vmin, vmax=config.vmax, origin='lower')
+    if img.is_cube and config.cbar == 'common':
+        if config.vmin is None:
+            config.vmin = np.nanmin(img.img)
+        if config.vmax is None:
+            config.vmax = np.nanmax(img.img)
 
-    # Draw the beam
-    draw_beam(ax, img, config)
+    for id_hz in range(img.nhz):
+        fig, ax = plt.subplots()
 
-    # Set the title
-    if config.title is None:
-        config.title = imagename
+        if img.is_cube:
+            cax = ax.imshow(img.img[id_hz], cmap=config.cmap, aspect='equal', vmin=config.vmin, vmax=config.vmax, origin='lower')
+        else:
+            cax = ax.imshow(img.img, cmap=config.cmap, aspect='equal', vmin=config.vmin, vmax=config.vmax, origin='lower')
 
-    # Set the axes options
-    set_axes_options(ax, config.title, img.axisname_x + f'[{unitDict[img.axis_unit_x]}]', 
-                     img.axisname_y + f'[{unitDict[img.axis_unit_y]}]',
-                     *img.get_ticks(config.xtickspan, config.ytickspan, config.relative, config.ticksfmt))
+        # Draw the beam
+        draw_beam(ax, img, config)
 
-    # Set the colorbar
-    set_cbar(fig, cax, img.imtype, img.im_unit, config.rescale, config.cbarfmt, ':.2f')
+        # Set the title
+        if config.title is None:
+            config.title = imagename
 
-    # Save the figure
-    if config.savename is not None:
-        if config.savename == '':
-            config.savename = imagename + '.png'
-        fig.savefig(config.savename, dpi=config.dpi)
-        print(f'Saved as "{config.savename}"')
+        # Set the axes options
+        set_axes_options(ax, config.title, img.axisname_x + f'[{unitDict[img.axis_unit_x]}]', 
+                         img.axisname_y + f'[{unitDict[img.axis_unit_y]}]',
+                         *img.get_ticks(config.xtickspan, config.ytickspan, config.relative, config.ticksfmt))
+
+        # Set the colorbar
+        set_cbar(fig, cax, img.imtype, img.im_unit, config.rescale, config.cbarfmt, ':.2f')
+
+        # Save the figure
+        savename = config.savename
+        if savename is not None:
+            if savename == '':
+                savename = imagename
+            if img.is_cube:
+                savename += f'-{id_hz}'
+            savename += '.png'
+            fig.savefig(savename, dpi=config.dpi)
+            print(f'Saved as "{savename}"')
 
     return ax, img, config

@@ -25,6 +25,12 @@ class Image:
 
         self.width = self.inform['shape'][0]
         self.height = self.inform['shape'][1]
+        self.nhz = self.inform['shape'][3]
+        if self.nhz > 1:
+            self.is_cube = True
+        else:
+            self.is_cube = False
+
         self.fig_width = width
         self.fig_height = height
         if self.width is None or self.height is None:
@@ -34,6 +40,7 @@ class Image:
         self.axisname_y = self.inform['axisnames'][1]
         self.incr_x = self.inform['incr'][0]
         self.incr_y = self.inform['incr'][1]
+        self.incr_hz = self.inform['incr'][3]
         self.beam = True
         try:
             self.beam_x = self.inform['restoringbeam']['major']['value']
@@ -56,7 +63,10 @@ class Image:
         top = (self.height + self.fig_height) // 2 - 1
         # data (imval)
         _ = imval(imagename=imagename, box=f'{left}, {bottom}, {right}, {top}')
-        self.img = np.array(_['data']).transpose()
+        if self.is_cube:
+            self.img = np.array(_['data']).transpose(2, 1, 0)
+        else:
+            self.img = np.array(_['data']).transpose()
 
     def get_fig_size(self) -> (int, int):
         """
