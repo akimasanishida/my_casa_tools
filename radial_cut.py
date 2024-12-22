@@ -2,9 +2,9 @@ from math import radians, cos, sin, ceil, sqrt
 import numpy as np
 from .Image import Image
 
-def line_cut(img: Image, azimuth: float, beam_factor: float = 0.5) -> tuple:
+def radial_cut(img: Image, azimuth: float, beam_factor: float = 0.5) -> tuple:
     """
-    Line cut of the image along the specified azimuth angle from the center.
+    Radial line cut of the image along the specified azimuth angle from the center.
 
     Args:
         img (Image): The Image object.
@@ -83,8 +83,8 @@ def line_cut(img: Image, azimuth: float, beam_factor: float = 0.5) -> tuple:
         # Append the pixel value to the line
         sample = []
         # if step == 0: 0 else -search_range
-        for i in range(-search_range, search_range):
-            for j in range(-search_range, search_range):
+        for i in range(-search_range, search_range + 1):
+            for j in range(-search_range, search_range + 1):
                 px = x + i
                 py = y + j
                 inside = True
