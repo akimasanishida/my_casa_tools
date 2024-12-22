@@ -43,7 +43,11 @@ def imshow(imagename: str, **kwargs):
         if config.vmax is None:
             config.vmax = np.nanmax(img.img)
 
+    fig_list = []
+
     for id_hz in range(img.nhz):
+        if config.chan is not None and id_hz != config.chan:
+            continue
         fig, ax = plt.subplots()
 
         if img.is_cube:
@@ -66,6 +70,8 @@ def imshow(imagename: str, **kwargs):
         # Set the colorbar
         set_cbar(fig, cax, config.cbarlabel, img.im_unit, config.rescale, config.cbarfmt, ':.2f')
 
+        fig_list.append(fig)
+
         # Save the figure
         savename = config.savename
         if savename is not None:
@@ -77,4 +83,4 @@ def imshow(imagename: str, **kwargs):
             fig.savefig(savename, dpi=config.dpi)
             print(f'Saved as "{savename}"')
 
-    return ax, img, config
+    return fig_list, img, config

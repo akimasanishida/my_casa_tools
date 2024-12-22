@@ -1,9 +1,11 @@
 class PlotConfig:
     """General configuration for plot.
     """
-    def __init__(self, savename: str = None,
+    def __init__(self,
+                 savename: str = None,
                  width: int = None,
                  height: int = None,
+                 chan: int = None,
                  title: str = None,
                  cmap: str = 'jet',
                  vmin: float = None,
@@ -26,6 +28,7 @@ class PlotConfig:
             savename: Save file name. If `None`, image will not be saved. If `''`, image name will be determine by `imagename` and the format will be png.
             width: Width of creating plot.
             height: Height of creating plot.
+            chan: Channel number of cube.
             title: Title of the image.
             cmap: Colormap. Default is `jet`.
             vmin: Minimum of data range that the colormap covers.
@@ -46,6 +49,7 @@ class PlotConfig:
         self.savename = savename
         self.width = width
         self.height = height
+        self.chan = chan
         self.title = title
         self.cmap = cmap
         self.vmin = vmin
