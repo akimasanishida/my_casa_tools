@@ -11,7 +11,8 @@ class PlotConfig:
                  vmin: float = None,
                  vmax: float = None,
                  cbar: str = 'common',
-                 cbarlabel: str = 'Intensity',
+                 cbarquantity: str = None,
+                 cbarunit: str = None,
                  cbeam: str = 'white',
                  rescale: str = 'milli',
                  cbarfmt: str = ':.2f',
@@ -34,7 +35,8 @@ class PlotConfig:
             vmin: Minimum of data range that the colormap covers.
             vmax: Maximum of data range that the colormap covers.
             cbar: Colorbar range settings. Default is `'common'`. Other options are `'individual'`. If vmin or vmax is given, these values will be used primarily.
-            cbarlabel: Label of colorbar. Default is `'Intensity'`.
+            cbarquantity: Label of colorbar.
+            cbarunit: Unit of colorbar.
             cbeam: Color of beam. Default is `'white'`.
             rescale: Rescaling factor. This must be given as SI prefixies. Default is `'milli'`. None or `''` for no-rescale.
             cbarfmt: Colorbar's format. Python's format function style. Default is `':.2f'`.
@@ -55,7 +57,8 @@ class PlotConfig:
         self.vmin = vmin
         self.vmax = vmax
         self.cbar = cbar
-        self.cbarlabel = cbarlabel
+        self.cbarquantity = cbarquantity
+        self.cbarunit = cbarunit
         self.cbeam = cbeam
         self.rescale = rescale
         self.cbarfmt = cbarfmt

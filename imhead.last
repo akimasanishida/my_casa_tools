@@ -1,0 +1,6 @@
+imagename = 'test/twhya_cont.image/'
+mode      = 'summary'
+hdkey     = ''
+hdvalue   = ''
+verbose   = False
+#imhead( imagename='test/twhya_cont.image/',mode='summary',hdkey='',hdvalue='',verbose=False )

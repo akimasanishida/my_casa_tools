@@ -3,6 +3,7 @@ from .utilities import get_pret_dir_name
 from .Image import Image
 from .PlotConfig import PlotConfig
 
+
 def prepare_image(imagename: str, **kwargs) -> (Image, PlotConfig):
     """
     Prepares the Image object and updates the configuration with the image dimensions.
