@@ -1,6 +1,6 @@
 import sys
 sys.path.append('.')
-import my_casa_tools as my
+import skrbcr_casa_scripts as my
 
 
 def test_lazy_raster(show=False):

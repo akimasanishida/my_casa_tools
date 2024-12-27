@@ -2,13 +2,14 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 from casatasks import imval, imhead
+from casatools import image, measures
 from .utilities import unitConvDict
 
 class Image:
     """Image class for my_tools
     """
 
-    def __init__(self, imagename, width: int = None, height: int = None):
+    def __init__(self, imagename, width: int = None, height: int = None, center_ra: str = None, center_dec: str = None):
         """
         Initializes the Image class with the provided image name, width, and height.
 
@@ -16,6 +17,8 @@ class Image:
             imagename: CASA style image file path.
             width: Width of area to open. Default to None.
             height: Height of area to open. Default to None.
+            center_ra: RA of the center. Default to None.
+            center_dec: Dec of the center. Default to None.
         """
         # info (imhead)
         self.imagename = imagename
@@ -61,12 +64,30 @@ class Image:
         right = (self.width + self.fig_width) // 2 - 1
         bottom = (self.height - self.fig_height) // 2
         top = (self.height + self.fig_height) // 2 - 1
-        # data (imval)
-        _ = imval(imagename=imagename, box=f'{left}, {bottom}, {right}, {top}')
-        if self.is_cube:
-            self.img = np.array(_['data']).transpose(2, 1, 0)
+
+        # Load data
+        ia = image()
+        ia.open(imagename)
+        if center_ra is not None and center_dec is not None:
+            me = measures()
+            center_coord = me.direction('J2000', v0=center_ra, v1=center_dec)
+            center_coord = ia.toworld([590, 580])
+            pix_center = ia.topixel(center_coord)
+            print(f'Center: {pix_center}')
+            x_center, y_center = int(pix_center['numeric'][0]), int(pix_center['numeric'][1])
+            print(f'Center: {x_center}, {y_center}')
         else:
-            self.img = np.array(_['data']).transpose()
+            x_center, y_center = self.width // 2, self.height // 2
+        blc = [x_center - self.fig_width // 2, y_center - self.fig_height // 2]
+        trc = [x_center + self.fig_width // 2, y_center + self.fig_height // 2]
+        rawdata = ia.getchunk(blc=blc, trc=trc)
+        ia.close()
+        # Need to reconsider the shape of self.img
+        rawdata = rawdata.transpose(3, 2, 1, 0)
+        if self.is_cube:
+            self.img = np.array(rawdata[0])
+        else:
+            self.img = np.array(rawdata[0][0])
 
     def get_fig_size(self) -> (int, int):
         """
