@@ -68,26 +68,43 @@ class Image:
         # Load data
         ia = image()
         ia.open(imagename)
-        if center_ra is not None and center_dec is not None:
+        if center_ra is not None or center_dec is not None:
             me = measures()
             center_coord = me.direction('J2000', v0=center_ra, v1=center_dec)
-            center_coord = ia.toworld([590, 580])
-            pix_center = ia.topixel(center_coord)
-            print(f'Center: {pix_center}')
+            pix_center = ia.topixel([center_coord['m0']['value'], center_coord['m1']['value']])
             x_center, y_center = int(pix_center['numeric'][0]), int(pix_center['numeric'][1])
-            print(f'Center: {x_center}, {y_center}')
         else:
             x_center, y_center = self.width // 2, self.height // 2
-        blc = [x_center - self.fig_width // 2, y_center - self.fig_height // 2]
-        trc = [x_center + self.fig_width // 2, y_center + self.fig_height // 2]
+        blc_x, blc_y = x_center - self.fig_width // 2, y_center - self.fig_height // 2
+        trc_x, trc_y = x_center + self.fig_width // 2, y_center + self.fig_height // 2
+        d_blc_x, d_blc_y = -blc_x, -blc_y
+        d_trc_x, d_trc_y = trc_x - self.width, trc_y - self.height
+        if d_blc_x > 0:
+            blc_x = 0
+            trc_x -= d_blc_x
+        if d_trc_x > 0:
+            trc_x = self.width
+            blc_x += d_trc_x
+        if d_blc_y > 0:
+            blc_y = 0
+            trc_y -= d_blc_y
+        if d_trc_y > 0:
+            trc_y = self.height
+            blc_y += d_trc_y
+        blc = [blc_x, blc_y]
+        trc = [trc_x, trc_y]
+        self.fig_height = trc_y - blc_y
+        self.fig_width = trc_x - blc_x
+        self.width = self.fig_width
+        self.height = self.fig_height
         rawdata = ia.getchunk(blc=blc, trc=trc)
         ia.close()
         # Need to reconsider the shape of self.img
         rawdata = rawdata.transpose(3, 2, 1, 0)
         if self.is_cube:
-            self.img = np.array(rawdata[0])
+            self.img = np.array(rawdata[0], dtype=float)
         else:
-            self.img = np.array(rawdata[0][0])
+            self.img = np.array(rawdata[0][0], dtype=float)
 
     def get_fig_size(self) -> (int, int):
         """

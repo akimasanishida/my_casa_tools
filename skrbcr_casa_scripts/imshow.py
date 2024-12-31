@@ -38,7 +38,7 @@ def draw_beam(ax: plt.Axes, img: Image = None, beam: tuple = None, color: str = 
     ax.add_patch(ellipse)
 
 
-def imshow(ax: plt.Axes, img: Image, config: PlotConfig) -> None:
+def imshow(ax: plt.Axes, img: Image, config: PlotConfig = None):
     """
     Rasterizes an image on given Axes object with matplotlib from a CASA style image file.
 
@@ -46,8 +46,14 @@ def imshow(ax: plt.Axes, img: Image, config: PlotConfig) -> None:
         ax (plt.Axes): The Axes object.
         img (Image): The Image object.
         config (PlotConfig): The PlotConfig object.
+
+    Returns:
+        matplotlib.image.AxesImage: The AxesImage object.
     """
-    imagename, img, config = prepare_image(imagename, **kwargs)
+    if config is None:
+        config = PlotConfig()
+    # imagename, img, config = prepare_image(imagename, **kwargs)
+    img.convert_axes_unit(config.axesunit)
     # plot
     if not config.show or img.is_cube:
         plt.ioff()
@@ -76,7 +82,7 @@ def imshow(ax: plt.Axes, img: Image, config: PlotConfig) -> None:
 
     # Set the title
     if config.title is None:
-        config.title = imagename
+        config.title = ''
 
     # Set the axes options
     set_axes_options(ax, config.title, img.axisname_x + f'[{unitDict[img.axis_unit_x]}]', 
@@ -87,6 +93,8 @@ def imshow(ax: plt.Axes, img: Image, config: PlotConfig) -> None:
     if config.cbarunit is None:
         config.cbarunit = img.im_unit
     set_cbar(im, config.cbarquantity, config.cbarunit, config.rescale, config.cbarfmt, ':.2f')
+
+    return im
 
 
 def lazy_raster(imagename: str, **kwargs) -> None:
