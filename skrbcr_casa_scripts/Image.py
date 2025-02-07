@@ -43,6 +43,11 @@ class Image:
 
             self.axisname_x = self.inform['axisnames'][0]
             self.axisname_y = self.inform['axisnames'][1]
+
+            self.x0 = self.inform['refval'][0]
+            self.y0 = self.inform['refval'][1]
+            self.freq0 = self.inform['refval'][3]
+
             self.incr_x = self.inform['incr'][0]
             self.incr_y = self.inform['incr'][1]
             self.incr_hz = self.inform['incr'][3]
