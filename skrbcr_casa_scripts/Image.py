@@ -55,7 +55,10 @@ class Image:
             try:
                 self.beam_x = self.inform['restoringbeam']['major']['value']
                 self.beam_y = self.inform['restoringbeam']['minor']['value']
-                self.beam_ang = self.inform['restoringbeam']['positionangle']['value']
+                if self.inform['restoringbeam']['positionangle']['unit'] == 'rad':
+                    self.beam_ang = np.rad2deg(self.inform['restoringbeam']['positionangle']['value'])
+                else:
+                    self.beam_ang = self.inform['restoringbeam']['positionangle']['value']
             except KeyError:
                 self.beam = False
             self.imtype = self.inform['imagetype']
@@ -107,7 +110,7 @@ class Image:
             rawdata = ia.getchunk(blc=blc, trc=trc)
             ia.close()
             # Need to reconsider the shape of self.img
-            rawdata = rawdata.transpose(3, 2, 1, 0)
+            rawdata = rawdata.transpose(2, 3, 1, 0)
             if self.is_cube:
                 self.img = np.array(rawdata[0], dtype=float)
             else:
