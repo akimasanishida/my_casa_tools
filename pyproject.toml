@@ -6,7 +6,7 @@ readme = "README.md"
 authors = [
     { name = "Akimasa NISHIDA" }
 ]
-requires-python = ">=3.11"
+requires-python = "==3.11"
 dependencies = [
     "casatasks>=6.6.5.31",
     "casatools>=6.6.5.31",
