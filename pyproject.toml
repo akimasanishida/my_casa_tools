@@ -1,8 +1,11 @@
 [project]
-name = "my-casa-tools"
-version = "0.1.0"
-description = "Add your description here"
+name = "skrbcr_casa_scripts"
+version = "1.0.0"
+description = "A collection of scripts for use with the NRAO CASA"
 readme = "README.md"
+authors = [
+    { name = "Akimasa NISHIDA" }
+]
 requires-python = ">=3.11"
 dependencies = [
     "casatasks>=6.6.5.31",
@@ -10,4 +13,20 @@ dependencies = [
     "matplotlib>=3.10.0",
     "numpy>=2.2.3",
     "scipy>=1.15.1",
+]
+license = { text = "MIT" }
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["skrbcr_casa_scripts*"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.4",
+    "ruff>=0.9.6",
+    "sphinx>=8.1.3",
+    "sphinx-rtd-theme>=3.0.2",
 ]
