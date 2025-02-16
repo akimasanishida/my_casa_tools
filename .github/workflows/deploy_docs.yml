@@ -18,20 +18,19 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Set up Python
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v5
       with:
-        python-version: '3.12'
+        python-version-file: "pyproject.toml"
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
 
     - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install sphinx
-        pip install sphinx_rtd_theme
-        pip install -r requirements.txt
+      run: uv pip freeze > requirements.txt
+      run: pip install -r requirements.txt
 
     - name: Build documentation
-      run: |
-        make -C sphinx html
+      run: make -C sphinx html
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
