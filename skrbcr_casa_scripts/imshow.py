@@ -2,6 +2,7 @@ import os
 import numpy as np
 from matplotlib.patches import Ellipse
 import matplotlib.pyplot as plt
+from scipy.ndimage import zoom
 from .Image import Image
 from .PlotConfig import PlotConfig
 from .utilities import unitDict, get_pret_dir_name
@@ -38,7 +39,7 @@ def draw_beam(ax: plt.Axes, img: Image = None, beam: tuple = None, color: str = 
     ax.add_patch(ellipse)
 
 
-def imshow(ax: plt.Axes, img: Image, config: PlotConfig) -> None:
+def imshow(ax: plt.Axes, img: Image, config: PlotConfig = None):
     """
     Rasterizes an image on given Axes object with matplotlib from a CASA style image file.
 
@@ -46,8 +47,14 @@ def imshow(ax: plt.Axes, img: Image, config: PlotConfig) -> None:
         ax (plt.Axes): The Axes object.
         img (Image): The Image object.
         config (PlotConfig): The PlotConfig object.
+
+    Returns:
+        matplotlib.image.AxesImage: The AxesImage object.
     """
-    imagename, img, config = prepare_image(imagename, **kwargs)
+    if config is None:
+        config = PlotConfig()
+    # imagename, img, config = prepare_image(imagename, **kwargs)
+    img.convert_axes_unit(config.axesunit)
     # plot
     if not config.show or img.is_cube:
         plt.ioff()
@@ -76,7 +83,7 @@ def imshow(ax: plt.Axes, img: Image, config: PlotConfig) -> None:
 
     # Set the title
     if config.title is None:
-        config.title = imagename
+        config.title = ''
 
     # Set the axes options
     set_axes_options(ax, config.title, img.axisname_x + f'[{unitDict[img.axis_unit_x]}]', 
@@ -87,6 +94,50 @@ def imshow(ax: plt.Axes, img: Image, config: PlotConfig) -> None:
     if config.cbarunit is None:
         config.cbarunit = img.im_unit
     set_cbar(im, config.cbarquantity, config.cbarunit, config.rescale, config.cbarfmt, ':.2f')
+
+    return im
+
+
+def overlay_contour(ax: plt.Axes, img_base: Image, img: Image, **kwargs) -> None:
+    """
+    Overlays contours on the image.
+
+    To plot with correct scaling, both Image objects should have `incr_x` and `incr_y` attributes.
+
+    Args:
+        ax (plt.Axes): The Axes object.
+        img_base (Image): Image plotted as background (This should have been already plotted).
+        img (Image): Image to be plotted as contours.
+        **kwargs: Contour configuration keywords of matplotlib.pyplot.contour.
+    """
+    try:
+        height, width = ax.get_images()[0].get_array().shape
+    except IndexError:
+        print('The background image is not plotted yet. Please plot the background image first.')
+        return
+
+    ratio = (abs(img.incr_x / img_base.incr_x), abs(img.incr_y / img_base.incr_y))
+    data = zoom(img.img, ratio, order=1)
+    # trim the data to the size of the background image by the center
+    if data.shape[0] > height:
+        diff = data.shape[0] - height
+        data = data[diff//2:diff//2+height]
+    if data.shape[1] > width:
+        diff = data.shape[1] - width
+        data = data[:, diff//2:diff//2+width]
+
+    # xlim = ax.get_xlim()
+    # ylim = ax.get_ylim()
+    # extent = ax.get_images()[0].get_extent()
+
+    # x = np.linspace(extent[0], extent[1], data.shape[1])
+    # y = np.linspace(extent[2], extent[3], data.shape[0])
+    # X, Y = np.meshgrid(x, y)
+
+    ax.contour(data, origin='lower', **kwargs)
+    # ax.contour(data, **kwargs)
+    # ax.set_xlim(xlim)
+    # ax.set_ylim(ylim)
 
 
 def lazy_raster(imagename: str, **kwargs) -> None:

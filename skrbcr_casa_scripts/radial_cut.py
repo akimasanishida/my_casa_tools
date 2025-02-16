@@ -2,6 +2,7 @@ from math import radians, cos, sin, ceil, sqrt
 import numpy as np
 from .Image import Image
 
+
 def radial_cut(img: Image, azimuth: float, beam_factor: float = 0.5) -> tuple:
     """
     Radial line cut of the image along the specified azimuth angle from the center.
