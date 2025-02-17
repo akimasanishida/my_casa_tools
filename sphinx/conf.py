@@ -27,7 +27,7 @@ napoleon_google_docstring = True
 autosummary_generate = True
 add_module_names = False
 autodoc_member_order = 'bysource'
-autodoc_mock_imports = ["casatasks"]
+autodoc_mock_imports = ["casatasks", "casatools"]
 
 templates_path = ['_templates']
 exclude_patterns = []
