@@ -10,7 +10,7 @@ import os
 import sys
 sys.path.append(os.path.abspath('..'))
 
-project = 'CASA Scripts Sets'
+project = 'skrbcr CASA Scripts'
 copyright = '2024, skrbcr'
 author = 'skrbcr'
 
