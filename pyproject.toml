@@ -1,6 +1,6 @@
 [project]
 name = "skrbcr_casa_scripts"
-version = "1.0.1"
+version = "1.0.2"
 description = "A collection of scripts for use with the NRAO CASA"
 readme = "README.md"
 authors = [
