@@ -98,7 +98,7 @@ def imshow(ax: plt.Axes, img: Image, config: PlotConfig = None):
     return im
 
 
-def overlay_contour(ax: plt.Axes, img_base: Image, img: Image, **kwargs) -> None:
+def overlay_contour(ax: plt.Axes, img_base: Image, img: Image, nchan=None, **kwargs) -> None:
     """
     Overlays contours on the image.
 
@@ -108,6 +108,7 @@ def overlay_contour(ax: plt.Axes, img_base: Image, img: Image, **kwargs) -> None
         ax (plt.Axes): The Axes object.
         img_base (Image): Image plotted as background (This should have been already plotted).
         img (Image): Image to be plotted as contours.
+        nchan (int): The channel number to be plotted. If img is a cube, this should be specified.
         **kwargs: Contour configuration keywords of matplotlib.pyplot.contour.
     """
     try:
@@ -116,8 +117,16 @@ def overlay_contour(ax: plt.Axes, img_base: Image, img: Image, **kwargs) -> None
         print('The background image is not plotted yet. Please plot the background image first.')
         return
 
+    if img.is_cube and nchan is None:
+        print('The channel number should be specified for the cube image.')
+        return
+
+    img.convert_axes_unit(img_base.axis_unit_x)
+
+    data = img.img[nchan] if img.is_cube else img.img
+
     ratio = (abs(img.incr_x / img_base.incr_x), abs(img.incr_y / img_base.incr_y))
-    data = zoom(img.img, ratio, order=1)
+    data = zoom(data, ratio, order=1)
     # trim the data to the size of the background image by the center
     if data.shape[0] > height:
         diff = data.shape[0] - height
