@@ -26,7 +26,7 @@ def set_cbar(im: matplotlib.image.AxesImage, observable: str, unit: str, rescale
         label_observable = 'Intensity'
     else:
         label_observable = observable
-    if unit is None:
+    if unit is None or unit == '':
         label_unit = ''
     else:
         label_unit = f'[{get_si_prefix_symbol(rescale) + unit}]'
