@@ -205,6 +205,7 @@ def load_image(
         )
     else:
         x_center, y_center = image.width // 2, image.height // 2
+    image.center_pix = (x_center, y_center)
     blc_x, blc_y = x_center - width // 2, y_center - height // 2
     trc_x, trc_y = x_center + width // 2, y_center + height // 2
     d_blc_x, d_blc_y = -blc_x, -blc_y
