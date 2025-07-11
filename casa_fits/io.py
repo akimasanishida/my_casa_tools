@@ -233,4 +233,7 @@ def load_image(
     rawdata = rawdata.transpose(2, 3, 1, 0)
     image.data = rawdata
 
+    # Convert RA/DEC units to arcsec
+    image.convert_axes_unit("arcsec")
+
     return image

@@ -1,14 +1,16 @@
 from math import sqrt, ceil, cos, radians, sin
 import numpy as np
 from .Image import Image
-
+from .utilities import downsample_data
 
 def radial_profile(
     img: Image,
-    azimuth: tuple = None,
+    azimuth: tuple | None = None,
     sample_size: int = 5,
     inc: float = 0.0,         # inclination in degrees (0 = face-on)
-    PA: float = 0.0           # position angle in degrees (east of north)
+    PA: float = 0.0,          # position angle in degrees (east of north)
+    stokes: int = 0,         # Stokes parameter index
+    chan: int = 0,           # Channel index
 ) -> tuple:
     """
     Extract a radial profile from an image.
@@ -19,6 +21,8 @@ def radial_profile(
         sample_size (int, optional): The number of samples to take along the radial line. Defaults to 5.
         inc (float, optional): The inclination angle in degrees. Defaults to 0.0.
         PA (float, optional): The position angle in degrees. Defaults to 0.0.
+        stokes (int, optional): Stokes parameter index. Defaults to 0.
+        chan (int, optional): Channel index. Defaults to 0.
 
     Returns:
         tuple: A tuple of three numpy arrays:
@@ -26,13 +30,17 @@ def radial_profile(
             - The mean intensity.
             - The standard deviation of the intensity.
     """
+    if img.width is None or img.height is None:
+        raise ValueError("Image width or height is None.")
     # Calculate the center of the image
     center_x = img.width // 2
     center_y = img.height // 2
 
     # Calculate the beam size
-    if not img.beam:
+    if img.beam is None:
         raise ValueError("The image does not have a beam size.")
+    if img.incr_x is None or img.incr_y is None:
+        raise ValueError("Image increment x or y is None.")
     img.convert_axes_unit('arcsec')
     beam_maj = img.beam[0] / np.abs(img.incr_x)
     beam_min = img.beam[1] / np.abs(img.incr_y)
@@ -65,29 +73,12 @@ def radial_profile(
 
     # extract the 2D data
     # get the dimensions of the image
-    if img.data.ndim == 4:
-        data = img.data[0, 0]
-    elif img.data.ndim == 3:
-        data = img.data[0]
-    elif img.data.ndim == 2:
-        data = img.data
-    else:
-        raise ValueError("Unsupported image data dimensions.")
-    
+    data: np.ndarray = img.get_two_dim_data(stokes, chan)
+
     # Downsample the data
-    width_crop = img.width - (img.width % sample_size)
-    height_crop = img.height - (img.height % sample_size)
-    # Crop the data with keeping the center
-    x_start = (img.width - width_crop) // 2
-    y_start = (img.height - height_crop) // 2
-    data = data[y_start:y_start + height_crop, x_start:x_start + width_crop]
-    # Downsample the data
-    width_new = width_crop // sample_size
-    height_new = height_crop // sample_size
-    # Define new center after downsampling
-    center_x_new = width_new // 2
-    center_y_new = height_new // 2
-    data = data.reshape(height_new, sample_size, width_new, sample_size).mean(axis=(1, 3))
+    data = downsample_data(data, sample_size)
+    center_x_new = data.shape[1] // 2
+    center_y_new = data.shape[0] // 2
 
     for i in range(len(data)):
         for j in range(len(data[0])):

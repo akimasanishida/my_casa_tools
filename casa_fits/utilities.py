@@ -1,5 +1,6 @@
 import math
 import os
+import numpy as np
 
 unitConvDict = {
     ('rad', 'rad'): 1,
@@ -75,3 +76,36 @@ def get_pret_dir_name(dir: str) -> str:
         str: The last component of the directory path.
     """
     return os.path.split(dir.rstrip('/'))[1]
+
+def downsample_data(data: np.ndarray, sample_size: int) -> np.ndarray:
+    """
+    Downsamples a 2D numpy array by averaging over blocks of size sample_size.
+
+    Args:
+        data (np.ndarray): The 2D numpy array to downsample.
+        sample_size (int): The size of the blocks to average over.
+
+    Returns:
+        np.ndarray: The downsampled 2D numpy array.
+    """
+    if data.ndim != 2:
+        raise ValueError("Input data must be a 2D numpy array.")
+    if sample_size <= 0:
+        raise ValueError("Sample size must be a positive integer.")
+    
+    height, width = data.shape
+    
+    # Crop the data to make sure dimensions are divisible by sample_size
+    width_crop = width - (width % sample_size)
+    height_crop = height - (height % sample_size)
+
+    # Crop the data with keeping the center
+    x_start = (width - width_crop) // 2
+    y_start = (height - height_crop) // 2
+    data = data[y_start:y_start + height_crop, x_start:x_start + width_crop]
+
+    # New width and height
+    width_new = width_crop // sample_size
+    height_new = height_crop // sample_size
+
+    return data.reshape(height_new, sample_size, width_new, sample_size).mean(axis=(1, 3))

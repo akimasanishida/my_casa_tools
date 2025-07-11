@@ -1,6 +1,7 @@
 import numpy as np
 from matplotlib.patches import Ellipse
 import matplotlib.pyplot as plt
+from matplotlib.axes import Axes
 from scipy.ndimage import zoom
 from .Image import Image
 
@@ -12,13 +13,13 @@ from .matplotlib_helper import set_cbar, set_axes_options
 
 
 def draw_beam(
-    ax: plt.Axes, img: Image = None, beam: tuple = None, color: str = "white"
+    ax: Axes, img: Image, beam: tuple | None = None, color: str = "white"
 ) -> None:
     """
     Draws the beam on the image.
 
     Args:
-        ax (plt.Axes): The Axes object.
+        ax (matplotlib.axes.Axes): The Axes object.
         img (Image): The Image object.
         beam (tuple): The beam parameters (beam_x, beam_y, beam_ang).
                       If both img and beam are provided, beam will be used.
@@ -28,7 +29,7 @@ def draw_beam(
     y_min, y_max = ax.get_ylim()
     beam_pos_x = x_min + (x_max - x_min) / 8
     beam_pos_y = y_min + (y_max - y_min) / 8
-    if img is not None and img.beam:
+    if img.beam is not None and img.incr_x is not None and img.incr_y is not None:
         beam_x = img.beam[0] / np.abs(img.incr_x)
         beam_y = img.beam[1] / np.abs(img.incr_y)
         beam_ang = img.beam[2]
@@ -48,12 +49,12 @@ def draw_beam(
     ax.add_patch(ellipse)
 
 
-def imshow(ax: plt.Axes, img: Image, **kwargs):
+def imshow(ax: Axes, img: Image, **kwargs):
     """
     Rasterizes an image on given Axes object with matplotlib from a CASA style image file.
 
     Args:
-        ax (plt.Axes): The Axes object.
+        ax (matplotlib.axes.Axes): The Axes object.
         img (Image): The Image object.
         config (PlotConfig): The PlotConfig object.
 
@@ -74,6 +75,9 @@ def imshow(ax: plt.Axes, img: Image, **kwargs):
     vmax = kwargs.get("vmax")
     vmin = kwargs.get("vmin")
 
+    if img.data is None:
+        raise ValueError("Image data is None.")
+
     if kwargs.get("cbar", "common") == "common":
         if vmin is None:
             vmin = np.nanmin(img.data)
@@ -83,21 +87,7 @@ def imshow(ax: plt.Axes, img: Image, **kwargs):
     # Specify the stokes and channel
     stokes = kwargs.get("stokes", 0)
     chan = kwargs.get("chan", 0)
-    # if kwargs.get('chan') is None:
-    #     id_hz = 0
-    # else:
-    #     id_hz = kwargs.get('chan')
-
-    # Draw the image
-    # if img.data is 4D, extract the specified stokes and channel
-    if img.data.ndim == 4:
-        data = img.data[stokes, chan]
-    elif img.data.ndim == 2:
-        data = img.data
-    else:
-        raise ValueError(
-            f"Unsupported data dimension: {img.data.ndim}. Expected 2D or 4D data."
-        )
+    data = img.get_two_dim_data(stokes=stokes, chan=chan)
 
     im = ax.imshow(
         data,
@@ -107,6 +97,15 @@ def imshow(ax: plt.Axes, img: Image, **kwargs):
         vmax=vmax,
         origin="lower",
     )
+    # Crop the image if specified with width or height
+    if width := kwargs.get("width"):
+        x_lim = ax.get_xlim()
+        x_mid = (x_lim[0] + x_lim[1]) // 2
+        ax.set_xlim(x_mid - width // 2, x_mid + width // 2)
+    if height := kwargs.get("height"):
+        y_lim = ax.get_ylim()
+        y_mid = (y_lim[0] + y_lim[1]) // 2
+        ax.set_ylim(y_mid - height // 2, y_mid + height // 2)
 
     # Draw the beam
     draw_beam(ax=ax, img=img, color=kwargs.get("cbeam", "white"))
@@ -115,6 +114,8 @@ def imshow(ax: plt.Axes, img: Image, **kwargs):
     title = kwargs.get("title", "")
 
     # Set the axes options
+    if img.unit_x is None or img.unit_y is None:
+        raise ValueError("Image unit_x or unit_y is None.")
     set_axes_options(
         ax,
         title,
@@ -125,6 +126,8 @@ def imshow(ax: plt.Axes, img: Image, **kwargs):
             kwargs.get("ytickspan", 2),
             kwargs.get("relative", True),
             kwargs.get("ticksfmt", ":.3f"),
+            width,
+            height,
         ),
     )
 
@@ -132,7 +135,7 @@ def imshow(ax: plt.Axes, img: Image, **kwargs):
     cbarunit = kwargs.get("cbar_unit", img.unit_data)
     set_cbar(
         im,
-        kwargs.get("cbar_label"),
+        kwargs.get("cbar_label", ""),
         cbarunit,
         kwargs.get("rescale", "milli"),
         kwargs.get("cbar_fmt", ":.2f"),
@@ -143,7 +146,7 @@ def imshow(ax: plt.Axes, img: Image, **kwargs):
 
 
 def overlay_contour(
-    ax: plt.Axes,
+    ax: Axes,
     img_base: Image,
     img: Image,
     stokes: int = 0,
@@ -165,7 +168,10 @@ def overlay_contour(
         **kwargs: Contour configuration keywords of matplotlib.pyplot.contour.
     """
     try:
-        height, width = ax.get_images()[0].get_array().shape
+        im_arr = ax.get_images()[0].get_array()
+        if im_arr is None:
+            raise ValueError("The axes is not plotted yet.")
+        height, width = im_arr.shape
     except IndexError:
         print(
             "The background image is not plotted yet. Please plot the background image first."
@@ -179,7 +185,12 @@ def overlay_contour(
     stokes = kwargs.get("stokes", 0)
     chan = kwargs.get("chan", 0)
 
+    if img_base.unit_x is None:
+        raise ValueError("Base image unit_x is None.")
     img.convert_axes_unit(img_base.unit_x)
+
+    if img.data is None:
+        raise ValueError("Image data is None.")
 
     match img.data.ndim:
         case 4:  # Stokes and channel
@@ -190,6 +201,11 @@ def overlay_contour(
             raise ValueError(
                 f"Unsupported data dimension: {img.data.ndim}. Expected 2D or 4D data."
             )
+
+    if img.incr_x is None or img.incr_y is None:
+        raise ValueError("Image increment x or y is None.")
+    if img_base.incr_x is None or img_base.incr_y is None:
+        raise ValueError("Base image increment x or y is None.")
 
     ratio = (abs(img.incr_x / img_base.incr_x), abs(img.incr_y / img_base.incr_y))
     data = zoom(data, ratio, order=1)
