@@ -1,6 +1,11 @@
 # skrbcr CASA scripts
 
-<a href='https://skrbcr.github.io/my_casa_tools/' target="_blank"><img alt='GitHub' src='https://img.shields.io/badge/Documentation-100000?style=flat&logo=GitHub&logoColor=white&labelColor=333333&color=007ec6'/></a>
+<h1 style="font-size: 25px"><strong>⚠️ This repository has been deprecated.</strong></h1>
+
+**This project has moved to a new repository: [CASA-FITS](https://github.com/akimasanishida/casa_fits).**  
+**Please refer to the new repository for the latest updates and development.**
+
+<a href='https://akimasanishida.github.io/my_casa_tools/' target="_blank"><img alt='GitHub' src='https://img.shields.io/badge/Documentation-100000?style=flat&logo=GitHub&logoColor=white&labelColor=333333&color=007ec6'/></a>
 
 Additional scripts for NRAO CASA.
 
