@@ -98,7 +98,7 @@ def imshow(ax: plt.Axes, img: Image, config: PlotConfig = None):
     return im
 
 
-def overlay_contour(ax: plt.Axes, img_base: Image, img: Image, **kwargs) -> None:
+def overlay_contour(ax: plt.Axes, img_base: Image, img: Image, fill=False, nchan=None, **kwargs) -> None:
     """
     Overlays contours on the image.
 
@@ -108,6 +108,8 @@ def overlay_contour(ax: plt.Axes, img_base: Image, img: Image, **kwargs) -> None
         ax (plt.Axes): The Axes object.
         img_base (Image): Image plotted as background (This should have been already plotted).
         img (Image): Image to be plotted as contours.
+        fill (bool): If `True`, the contours will be filled. Default is `False`.
+        nchan (int): The channel number to be plotted. If img is a cube, this should be specified.
         **kwargs: Contour configuration keywords of matplotlib.pyplot.contour.
     """
     try:
@@ -116,8 +118,16 @@ def overlay_contour(ax: plt.Axes, img_base: Image, img: Image, **kwargs) -> None
         print('The background image is not plotted yet. Please plot the background image first.')
         return
 
+    if img.is_cube and nchan is None:
+        print('The channel number should be specified for the cube image.')
+        return
+
+    img.convert_axes_unit(img_base.axis_unit_x)
+
+    data = img.img[nchan] if img.is_cube else img.img
+
     ratio = (abs(img.incr_x / img_base.incr_x), abs(img.incr_y / img_base.incr_y))
-    data = zoom(img.img, ratio, order=1)
+    data = zoom(data, ratio, order=1)
     # trim the data to the size of the background image by the center
     if data.shape[0] > height:
         diff = data.shape[0] - height
@@ -134,7 +144,10 @@ def overlay_contour(ax: plt.Axes, img_base: Image, img: Image, **kwargs) -> None
     # y = np.linspace(extent[2], extent[3], data.shape[0])
     # X, Y = np.meshgrid(x, y)
 
-    ax.contour(data, origin='lower', **kwargs)
+    if fill:
+        ax.contourf(data, origin='lower', **kwargs)
+    else:
+        ax.contour(data, origin='lower', **kwargs)
     # ax.contour(data, **kwargs)
     # ax.set_xlim(xlim)
     # ax.set_ylim(ylim)
@@ -191,6 +204,7 @@ def lazy_raster(imagename: str, **kwargs) -> None:
     if config.cbarunit is None:
         config.cbarunit = img.im_unit
     set_cbar(im, config.cbarquantity, config.cbarunit, config.rescale, config.cbarfmt, ':.2f')
+    fig.tight_layout()
 
     # Save the figure
     savename = config.savename

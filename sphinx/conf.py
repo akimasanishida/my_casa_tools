@@ -10,7 +10,7 @@ import os
 import sys
 sys.path.append(os.path.abspath('..'))
 
-project = 'CASA Scripts Sets'
+project = 'skrbcr CASA scripts'
 copyright = '2024, skrbcr'
 author = 'skrbcr'
 
@@ -27,7 +27,7 @@ napoleon_google_docstring = True
 autosummary_generate = True
 add_module_names = False
 autodoc_member_order = 'bysource'
-autodoc_mock_imports = ["casatasks"]
+autodoc_mock_imports = ["casatasks", "casatools"]
 
 templates_path = ['_templates']
 exclude_patterns = []

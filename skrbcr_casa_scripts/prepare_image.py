@@ -17,7 +17,7 @@ def prepare_image(imagename: str, **kwargs) -> (Image, PlotConfig):
     """
     config = PlotConfig()
     config.__dict__.update(kwargs)
-    img = Image(imagename, config.width, config.height)
+    img = Image(imagename=imagename, width=config.width, height=config.height)
     config.width, config.height = img.get_fig_size()
     img.convert_axes_unit(config.axesunit)
     imagename = get_pret_dir_name(imagename)
